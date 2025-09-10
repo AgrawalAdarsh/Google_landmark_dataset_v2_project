@@ -56,9 +56,12 @@ def predict():
         img = preprocess_image(file)
         preds = model.predict(img)
         predicted_class = int(np.argmax(preds, axis=1)[0])
-        return jsonify({"predicted_class": predicted_class})
+
+        # Return only number
+        return jsonify(predicted_class=predicted_class)
+
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify(error=str(e))
 
 @app.route("/healthz")
 def health():

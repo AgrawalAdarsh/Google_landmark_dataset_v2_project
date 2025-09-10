@@ -3,16 +3,18 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import os
+import gdown
 
 app = Flask(__name__)
 
-# Path to model already downloaded in Docker image
+# Path to model
 MODEL_PATH = os.path.join(os.getcwd(), "final_model.keras")
 
-# Load model at startup
-print("Loading model...")
-model = tf.keras.models.load_model(MODEL_PATH)
-print("Model loaded successfully!")
+# Google Drive file ID (set your model ID here)
+GDRIVE_FILE_ID = "1UGfgPYFZvwq3jmDpfTNJ65nQKFQzpGFa"
+
+# Global variable for lazy loading
+model = None
 
 # Preprocess image
 def preprocess_image(file):
@@ -20,6 +22,19 @@ def preprocess_image(file):
     img = cv2.resize(img, (224, 224))
     img = img.astype("float32") / 255.0
     return np.expand_dims(img, axis=0)
+
+# Function to load the model (lazy)
+def load_model():
+    global model
+    if model is None:
+        if not os.path.exists(MODEL_PATH):
+            print("Downloading model using gdown...")
+            url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+            gdown.download(url, MODEL_PATH, quiet=False)
+            print("Download complete!")
+        print("Loading model...")
+        model = tf.keras.models.load_model(MODEL_PATH)
+        print("Model loaded successfully!")
 
 @app.route("/")
 def index():
@@ -29,10 +44,15 @@ def index():
 def predict():
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"})
+    
     file = request.files["file"]
     if file.filename == "":
         return jsonify({"error": "No file selected"})
+    
     try:
+        # Lazy load model if not loaded
+        load_model()
+
         img = preprocess_image(file)
         preds = model.predict(img)
         predicted_class = int(np.argmax(preds, axis=1)[0])

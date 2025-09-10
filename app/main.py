@@ -8,43 +8,54 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Path to model
+# ======================
+# Paths and model setup
+# ======================
 MODEL_PATH = os.path.join(os.getcwd(), "final_model.keras")
-TRAIN_CSV = os.path.join(os.getcwd(), "train.csv")
-
-# Google Drive file ID (set your model ID here)
+CSV_PATH = os.path.join(os.getcwd(), "train.csv")  # train.csv with id, landmark_id
 GDRIVE_FILE_ID = "1UGfgPYFZvwq3jmDpfTNJ65nQKFQzpGFa"
 
-# Global variable for lazy loading
+# Globals
 model = None
-df = None   # dataframe for labels
+class_counts = None
 
+# ======================
 # Preprocess image
+# ======================
 def preprocess_image(file):
     img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
     img = cv2.resize(img, (224, 224))
     img = img.astype("float32") / 255.0
     return np.expand_dims(img, axis=0)
 
-# Function to load the model (lazy)
+# ======================
+# Lazy load model + CSV
+# ======================
 def load_model():
-    global model
+    global model, class_counts
     if model is None:
+        # Download model if not present
         if not os.path.exists(MODEL_PATH):
             print("Downloading model using gdown...")
             url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
             gdown.download(url, MODEL_PATH, quiet=False)
             print("Download complete!")
+
         print("Loading model...")
         model = tf.keras.models.load_model(MODEL_PATH)
         print("Model loaded successfully!")
 
-# Load train.csv for label counts
-def load_labels():
-    global df
-    if df is None and os.path.exists(TRAIN_CSV):
-        df = pd.read_csv(TRAIN_CSV)
+        # Load train.csv and compute counts
+        if os.path.exists(CSV_PATH):
+            df = pd.read_csv(CSV_PATH)
+            class_counts = df["landmark_id"].value_counts().to_dict()
+            print("Class counts loaded.")
+        else:
+            print("Warning: train.csv not found, sample counts unavailable.")
 
+# ======================
+# Routes
+# ======================
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -59,25 +70,22 @@ def predict():
         return "Error: No file selected", 400
     
     try:
-        # Lazy load model + labels
+        # Load model and counts if needed
         load_model()
-        load_labels()
 
         img = preprocess_image(file)
         preds = model.predict(img)
         predicted_index = int(np.argmax(preds, axis=1)[0])
 
-        # Count samples in that class (from train.csv)
-        sample_cnt = None
-        if df is not None:
-            sample_cnt = (df["landmark_id"] == predicted_index).sum()
+        # Lookup class count
+        sample_count = class_counts.get(predicted_index, "Unknown") if class_counts else "Unavailable"
 
-        # Format output
-        result = f"Predicted Label: {predicted_index}"
-        if sample_cnt is not None:
-            result += f"\nSamples in class {predicted_index}: {sample_cnt}"
-
-        return result
+        # Return nice formatted string
+        return (
+            f"Label: {predicted_index}\n"
+            f"Classified as: {predicted_index}\n"
+            f"Samples in class {predicted_index}: {sample_count}"
+        )
 
     except Exception as e:
         return f"Error: {str(e)}", 500
@@ -86,5 +94,8 @@ def predict():
 def health():
     return "OK"
 
+# ======================
+# Run
+# ======================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

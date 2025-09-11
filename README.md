@@ -53,7 +53,9 @@ Users can interact with the model through a clean and simple **web interface**.
 ---
 
 ## 📂 Project Structure
+
 Google_landmark_dataset_v2_project/
+
 +-- app/                      
 |   +-- static/               
 |   |   +-- images/          

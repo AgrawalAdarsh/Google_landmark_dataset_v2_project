@@ -54,19 +54,18 @@ Users can interact with the model through a clean and simple **web interface**.
 
 ## 📂 Project Structure
 Google_landmark_dataset_v2_project/
-│
-├── - app/ # Flask application
-│ ├── - static/ # Static files (CSS, JS, images)
-│ │ └── - images/
-│ │ └── - profilepic.jpeg
-│ └── - templates/ # HTML templates
-│ └── - index.html
-│ └── - main.py # Flask app entry point
-│
-├── - model_loader.py # Loads the trained CNN model
-├── - final_model.keras # Saved trained model
-├── - requirements.txt # Python dependencies
-├── - Procfile # Deployment config for Render
+├─ app/                       # Flask application [web:5][web:6]
+│  ├─ static/                 # Static files (CSS, JS, images) [web:5][web:6]
+│  │  └─ images/              # Project images [web:5][web:6]
+│  │     └─ profilepic.jpeg   [web:5][web:6]
+│  ├─ templates/              # HTML templates [web:5][web:6]
+│  │  └─ index.html           [web:5][web:6]
+│  └─ main.py                 # Flask app entry point [web:5][web:6]
+├─ model_loader.py            # Loads the trained CNN model [web:5][web:6]
+├─ final_model.keras          # Saved trained model [web:5][web:6]
+├─ requirements.txt           # Python dependencies [web:5][web:6]
+└─ Procfile                   # Deployment config for Render [web:5][web:6]
+
 
 ---
 

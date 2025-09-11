@@ -72,6 +72,18 @@ Google_landmark_dataset_v2_project/
 
 ---
 
+---
+
+## 🎥 Demo Video
+
+Click the image below to watch the demo video:
+
+[![Watch the video](https://img.shields.io/badge/▶️%20Watch%20Demo%20Video-red?style=for-the-badge)](https://drive.google.com/file/d/1Cg6V0pLHu3fwkUTP2nGEX1nvaJeKsje5/view?usp=drive_link)
+
+---
+
+---
+
 ## 🖼️ Screenshots & Example Predictions
 
 **🏠 Home Page / About the Project**  

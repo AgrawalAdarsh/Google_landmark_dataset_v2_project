@@ -11,9 +11,13 @@ app = Flask(__name__)
 # ======================
 # Paths and model setup
 # ======================
-MODEL_PATH = os.path.join(os.getcwd(), "final_model.keras")
-CSV_PATH = os.path.join(os.getcwd(), "train.csv")  # train.csv with id, landmark_id
-GDRIVE_FILE_ID = "1UGfgPYFZvwq3jmDpfTNJ65nQKFQzpGFa"
+BASE_DIR = os.getcwd()  # Root of project
+MODEL_PATH = os.path.join(BASE_DIR, "final_model.keras")
+CSV_PATH = os.path.join(BASE_DIR, "train.csv")  # train.csv with id, landmark_id
+
+# Google Drive IDs
+MODEL_GDRIVE_ID = "1UGfgPYFZvwq3jmDpfTNJ65nQKFQzpGFa"
+CSV_GDRIVE_ID = "15e4OKT1sMt4ESUpYzGZiRIS9D7FimR1x"
 
 # Globals
 model = None
@@ -29,29 +33,35 @@ def preprocess_image(file):
     return np.expand_dims(img, axis=0)
 
 # ======================
-# Lazy load model + CSV
+# Download file if missing
+# ======================
+def download_if_missing(file_path, gdrive_id):
+    if not os.path.exists(file_path):
+        print(f"Downloading {os.path.basename(file_path)} from Google Drive...")
+        url = f"https://drive.google.com/uc?id={gdrive_id}"
+        gdown.download(url, file_path, quiet=False)
+        print(f"{os.path.basename(file_path)} download complete!")
+
+# ======================
+# Load model + CSV
 # ======================
 def load_model():
     global model, class_counts
-    if model is None:
-        # Download model if not present
-        if not os.path.exists(MODEL_PATH):
-            print("Downloading model using gdown...")
-            url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
-            gdown.download(url, MODEL_PATH, quiet=False)
-            print("Download complete!")
 
+    if model is None:
+        # Ensure model and CSV exist
+        download_if_missing(MODEL_PATH, MODEL_GDRIVE_ID)
+        download_if_missing(CSV_PATH, CSV_GDRIVE_ID)
+
+        # Load model
         print("Loading model...")
         model = tf.keras.models.load_model(MODEL_PATH)
         print("Model loaded successfully!")
 
-        # Load train.csv and compute counts
-        if os.path.exists(CSV_PATH):
-            df = pd.read_csv(CSV_PATH)
-            class_counts = df["landmark_id"].value_counts().to_dict()
-            print("Class counts loaded.")
-        else:
-            print("Warning: train.csv not found, sample counts unavailable.")
+        # Load CSV for class counts
+        df = pd.read_csv(CSV_PATH)
+        class_counts = df["landmark_id"].value_counts().to_dict()
+        print("Class counts loaded.")
 
 # ======================
 # Routes
@@ -80,7 +90,6 @@ def predict():
         # Lookup class count
         sample_count = class_counts.get(predicted_index, "Unknown") if class_counts else "Unavailable"
 
-        # Return nice formatted string
         return (
             f"Label: {predicted_index}\n"
             f"Classified as: {predicted_index}\n"

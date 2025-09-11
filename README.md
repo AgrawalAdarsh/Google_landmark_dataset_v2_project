@@ -58,7 +58,8 @@ Google_landmark_dataset_v2_project/
 |   +-- static/               
 |   |   +-- images/          
 |   |       +-- profilepic.jpeg 
-|   +-- +-- templates/            
+
+|   +-- templates/            
 |   |       +-- index.html        
 |   +-- main.py              
 +-- model_loader.py          

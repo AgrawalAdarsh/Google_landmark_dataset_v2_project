@@ -69,21 +69,6 @@ Google_landmark_dataset_v2_project/
 
 ---
 
-## 🖼️ Screenshots & Example Predictions
-
-**🏠 Home Page / About the Project**  
-![Home Page](./screenshots/d6f9c1cb-9570-4dd0-a3a6-e25e1aebb763.png)
-
-**📤 Try It Yourself / Image Upload**  
-![Try It Yourself](./screenshots/31ad0ab1-809c-4720-b18a-67a955c5287e.png)
-
-**✅ Prediction Example**  
-![Prediction Example](./screenshots/84e7c957-f88f-459d-9d37-c4277c2203d9.png)
-
----
-
----
-
 ## 🚀 Installation & Usage
 
 1. **Clone the repository**

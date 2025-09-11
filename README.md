@@ -36,6 +36,22 @@ Users can interact with the model through a clean and simple **web interface**.
 
 ---
 
+---
+
+> **⚠️ Note:**  
+> This project uses only **~2GB of the Google Landmark Detection Dataset v2** (the original dataset is ~500GB).  
+> Because of this limitation:  
+> - The model recognizes only a **small subset of landmarks**.  
+> - Predictions may sometimes repeat or seem “stuck” on a few classes.  
+> - Running on **free-tier hosting (Render)** also means inference may take a few seconds.  
+>
+> This is expected behavior and part of the learning-focused nature of this project.
+> Currently working to resolve this issue....
+
+---
+
+---
+
 ## 📂 Project Structure
 Google_landmark_dataset_v2_project/
 │
